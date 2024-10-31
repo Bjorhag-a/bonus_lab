@@ -1,0 +1,20 @@
+Package: bonus
+Type: Package
+Title: Bonus Lab
+Version: 1.0
+Date: 2024-10-30
+Author: Björhag, Alexander
+Maintainer: <alebj452@student.liu.se>
+Description: Assignment for the bonus lab in Advanced R programming.
+License: GPL-3 + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 3.5.0),
+    ggplot2,
+    methods
+RoxygenNote: 7.3.2
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
