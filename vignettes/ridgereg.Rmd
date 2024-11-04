@@ -1,0 +1,79 @@
+---
+title: "ridgereg"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ridgereg}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+install.packages("caret")
+install.packages("leaps")
+library(bonus)
+library(caret)
+library(leaps)
+
+```
+
+```{r}
+library(MASS)
+data("Boston")
+head(Boston)
+```
+
+```{r}
+set.seed(98)
+inTraining <- createDataPartition(Boston$medv, p = .80, list = FALSE)
+training <- Boston[inTraining, ]
+testing  <- Boston[-inTraining, ]
+```
+
+##  Linear regression model with forward selection
+```{r}
+forward_lm <- train(medv ~ ., data = training, 
+                 method = "leapForward"
+                 )
+forward_lm
+summary(forward_lm)
+```
+
+
+```{r plot backward}
+
+plot(forward_lm)
+```
+
+
+
+##  Linear regression model 
+```{r}
+normal_lm <- train(medv ~ ., data = training, 
+                 method = "lm"
+                 )
+normal_lm
+summary(normal_lm)
+```
+
+
+
+
+
+## Evaluate the performance of this model on the training dataset
+```{r evaluate}
+pred <- predict(normal_lm, training)
+postResample(pred = pred, obs = training$medv)
+
+```
+```{r evaluate forward}
+pred_forward <- predict(forward_lm, training)
+postResample(pred = pred_forward, obs = training$medv)
+
+```

@@ -184,7 +184,11 @@ linreg <- setRefClass("linreg",
                           }
                           
                           cat(paste("Residual standard error: ", sqrt(.self$res_var), " on ", .self$df," degrees of freedom", sep = ""))
+                        },
+                        ridgereg = function(formula, data, lambda){
+                          
                         }
+
                       )
 )
 

@@ -1,0 +1,105 @@
+---
+title: "flight_delay"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{flight_delay}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bonus)
+library(dplyr)
+library(caret)
+```
+
+# Data from nycflights13
+The data we use come from the nycflights13 where we get some weather data on different airports and some data on flights that departure and arrive at different airports
+```{r}
+weather <- nycflights13::weather
+flights <- nycflights13::flights
+```
+
+
+## Data cleaning 
+The selection on variables from the 2 different data sets is decided here and most of the variables from the weather data set is kept but some variables from the flight data set is removed due to not believing that they give more information. Some examples of removed variables is tailnum and distance.
+There is also 2 new interaction variables that is made that can be interesting to analyze. The interaction variables is precip_wind_speed and precip_visib (look code).
+Also cleaning the data from missing values that resulted in 14964 observations got removed and the total observation number of the data is 326 993 with 19 varaibles.
+
+```{r clean data}
+weather <- weather %>% 
+  select(origin, year, month, day, hour, temp, dewp, humid, wind_dir, wind_speed, precip, pressure, visib)
+
+flights <- flights %>% 
+  select(dep_delay, arr_delay, carrier, origin, dest,
+         year, month, day, hour)
+
+#Need to join them by year, month, day and hour otherwise the data set gets too big for only origin 
+comb_data <- weather %>% 
+  left_join(flights, by = c("origin","year", "month", "day", "hour"))
+
+comb_data <- comb_data %>% 
+  mutate(precip_visib = precip * visib,
+         precip_wind_speed = precip * wind_speed)
+
+comb_data <- comb_data %>% 
+   filter(!is.na(dep_delay))
+  
+```
+
+## Split for training 
+Here the data is split into 80% training data and the 20% left of the data as split_data. This results that the training data has 261 596 observations now and the split_data will be split again into validation and test sets 
+```{r}
+set.seed(98)
+inTraining <- createDataPartition(comb_data$dep_delay, p = .80, list = FALSE)
+training_data <- comb_data[inTraining, ]
+split_data  <- comb_data[-inTraining, ]
+```
+
+## Split for validation 
+The data is split again from the remaining data into test and validation where the validation data is 15% and the test data is 5%. That results to that the test data has 16 347 observations and the validation data has 49 050 observations. 
+```{r}
+
+validation <- createDataPartition(split_data$dep_delay, p = 0.75, list = FALSE)
+validation_data <- split_data[validation, ]
+test_data <- split_data[-validation, ]
+```
+
+
+# Training the model with different $\lambda$ 
+
+```{r}
+model <- ridgereg$new(dep_delay ~ ., data = training_data, lambda = 0.5)
+```
+
+
+
+## Train ridge regressions models for different values of $\lambda$
+
+```{r rmse}
+rmse <- function(error)
+{
+    sqrt(mean(error^2))
+}
+
+```
+
+
+
+## Predict for the best $\lambda$ on the test data
+```{r test data}
+
+
+
+```
+
+
+
+
