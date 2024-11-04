@@ -76,7 +76,7 @@ test_data <- split_data[-validation, ]
 # Training the model with different $\lambda$ 
 
 ```{r}
-model <- ridgereg$new(dep_delay ~ ., data = training_data, lambda = 0.5)
+#model <- ridgereg$new(dep_delay ~ ., data = training_data, lambda = 0.5)
 ```
 
 

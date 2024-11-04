@@ -1,19 +1,23 @@
-#' Title
+#'  @title Reference Class representing a Ridge Linear regression using least square 
+#'  
+#' @description ridgereg is used to fit linear models with a penalty lambda and
+#'   using ordinary linear algebra to calculate the Regressions coefficients and
+#'   fitted values
+#'   
+#' @name ridgereg
+#' @field formula a formula object. 
+#' @field data a data frame.  
+#' @field lambda a numeric number. 
 #'
-#' @field formula formula. 
-#' @field data_name name. 
-#' @field data data.frame. 
-#' @field lambda numeric. 
-#' @field y numeric. 
-#' @field beta array. 
-#' @field y_hat array. 
-#' @field X array. 
-#' @field x_norm array. 
-#'
-#' @return
-#' @export
+#' @returns an object of class `ridgereg`
+#' @export ridgereg
 #'
 #' @examples
+#' #' # data(iris)
+#' # l <- ridgereg$new(formula=Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
+#' # l$coef()
+#' 
+
 ridgereg <- setRefClass("ridgereg", 
                         fields = list(
                           formula = "formula",
@@ -55,18 +59,18 @@ ridgereg <- setRefClass("ridgereg",
                             cat("\n")
                             
                             # format call output
-                            cat(paste("ridgereg(formula = ",deparse(.self$formula), ", data = ", .self$data_name, ", lambda = ", .self$lambda, ")",  sep = ""))
+                            cat(paste("ridgereg(formula = ", deparse(.self$formula), ", data = ", .self$data_name, ", lambda = ", .self$lambda, ")",  sep = ""))
                             cat("\n")
                             
                             cat("Coefficients:")
                             cat("\n")
                             
-                            col_names <- c("(Intercept)",all.vars(.self$formula)[-(1:2)])
-                            max_length <- pmax(nchar(col_names))
+                            col_names <- c("(Intercept)", all.vars(.self$formula)[-1])
+                            max_length <- max(nchar(col_names))
                             
                             # format output for table shape
                             line1 <- paste(sprintf(paste0("%-", max_length, "s"), col_names), collapse = " ")
-                            line2 <- paste(sprintf(paste0("%-", max_length, "s"), format(beta, digits = 3)), collapse = " ")
+                            line2 <- paste(sprintf(paste0("%-", max_length, "s"), format(.self$beta, digits = 3)), collapse = " ")
                             
                             cat(line1)
                             cat("\n")
@@ -82,11 +86,10 @@ ridgereg <- setRefClass("ridgereg",
                               
                             }
                             else{
-                              x_new <- model.matrix(.self$formula, newdata)
-                              x_new_scale <- cbind(x_new[, 1], scale(x_new[, -1]))
-                              
-                              pred <- x_new_scale %*% .self$beta
-                              return(pred)
+                              sds <- apply(X[,-1], 2, sd)
+                              newdata_norm <- scale(newdata,colMeans(X[,-1]),sds)
+                              prediction <- as.matrix(cbind(1,newdata_norm)) %*% reg_coef_ridge
+                              return(prediction)
                             }
                             
                           },
@@ -97,9 +100,11 @@ ridgereg <- setRefClass("ridgereg",
                         ))
 
 
-model <- ridgereg$new(Petal.Length~ Sepal.Length + Petal.Width , data = iris, lambda = 0.5)
-model
-model$coef()
-model$print()
-model$predict()
-
+# model <- ridgereg$new(Petal.Length~ Sepal.Length + Petal.Width , data = iris, lambda = 0.5)
+# model
+# model$coef()
+# model$print()
+# model$predict()
+# ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
+# ridgereg_mod$predict()
+# ridgereg_mod$coef()

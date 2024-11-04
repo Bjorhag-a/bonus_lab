@@ -8,8 +8,7 @@
 #' circle increases depending on the mean departure delay.
 #' 
 #' @export
-#'
-#' @examples
+#' 
 #' @import ggplot2
 #' @import dplyr
 #' @import magrittr
