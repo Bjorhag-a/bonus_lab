@@ -79,7 +79,7 @@ ridgereg <- setRefClass("ridgereg",
                             cat("\n")
                             cat(line2)
                             
-                           
+                            
                             
                           },
                           predict = function(newdata = NULL){
@@ -101,10 +101,10 @@ ridgereg <- setRefClass("ridgereg",
                           }
                           
                         ))
-#ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
-#print(ridgereg_mod)
-# ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
+ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
+print(ridgereg_mod)
+ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
 # class(ridgereg_mod)[1] == "ridgereg"
-# ridgereg_mod$predict()
+ridgereg_mod$predict()
 #ridgereg_mod$print()
-# ridgereg_mod$show()
+ridgereg_mod$coef()

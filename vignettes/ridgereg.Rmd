@@ -101,7 +101,7 @@ ridge_model <- list(label = "Ridge regression model",
                     },
                     fit = function(x, y, param, lev, last, weights, classProbs, ...){
                       data <- as.data.frame(cbind(x, y))
-                      model <- ridgereg$new(y ~ ., data, lambda = param$lambda)
+                      model <- bonus::ridgereg$new(y ~ ., data, lambda = param$lambda)
                       return(model)
                     },
                     predict = function(modelFit, newdata, preProc = NULL, submodels = NULL){
@@ -122,9 +122,9 @@ ridge_model <- list(label = "Ridge regression model",
 fitControl <- trainControl(method = "cv",
                            ## 10-fold CV...
                            number = 10)
-ridge <- train(medv ~., data = training,
-               method = ridge_model, 
-               trControl = fitControl)
+#ridge <- train(medv ~., data = training,
+               #method = ridge_model, 
+               #trControl = fitControl)
 ```
 
 

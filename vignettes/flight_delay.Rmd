@@ -34,26 +34,30 @@ flights <- nycflights13::flights
 ## Data cleaning 
 The selection on variables from the 2 different data sets is decided here and most of the variables from the weather data set is kept but some variables from the flight data set is removed due to not believing that they give more information. Some examples of removed variables is tailnum and distance.
 There is also 2 new interaction variables that is made that can be interesting to analyze. The interaction variables is precip_wind_speed and precip_visib (look code).
-Also cleaning the data from missing values that resulted in 14964 observations got removed and the total observation number of the data is 326 993 with 19 varaibles.
+Also cleaning the data from missing values that resulted in 57407 observations got removed and the total observation number of the data is 284 550 with 19 variables.
 
 ```{r clean data}
 weather <- weather %>% 
-  dplyr::select(origin, year, month, day, hour, temp, dewp, humid, wind_dir, wind_speed, precip, pressure, visib)
+  dplyr::select(origin, day, month, temp, dewp, humid, wind_dir, wind_speed, precip, pressure, visib)
 
 flights <- flights %>% 
-  dplyr::select(dep_delay, arr_delay, carrier, origin, dest,
-         year, month, day, hour)
+  dplyr::select(dep_delay, arr_delay, carrier, origin, dest, month, day)
 
 #Need to join them by year, month, day and hour otherwise the data set gets too big for only origin 
 comb_data <- weather %>% 
-  left_join(flights, by = c("origin","year", "month", "day", "hour"))
+  left_join(flights, by = c("origin", "month", "day"))
+
+comb_data$carrier <- as.factor(comb_data$carrier)
+comb_data$origin <- as.factor(comb_data$origin)
+comb_data$dest <- as.factor(comb_data$dest)
+
+comb_data <- comb_data %>% 
+  filter_at(vars(dep_delay, temp, dewp, humid, wind_dir, pressure, arr_delay), all_vars(!is.na(.)))
 
 comb_data <- comb_data %>% 
   mutate(precip_visib = precip * visib,
          precip_wind_speed = precip * wind_speed)
 
-comb_data <- comb_data %>% 
-   filter(!is.na(dep_delay))
   
 ```
 
@@ -79,9 +83,16 @@ test_data <- split_data[-validation, ]
 # Training the model with different $\lambda$ 
 
 ```{r}
-lambda_values <- seq(0, 10, by = 0.2)
+# lambda_values <- seq(0, 10, by = 0.2)
+# 
+#model <- ridgereg$new(dep_delay ~ ., data = training_data, lambda = 0.01)
 
-model <- ridgereg$new(dep_delay ~ ., data = training_data, lambda = 0.5)
+```
+
+```{r}
+#model$coef()
+#dim(training_data)
+#summary(training_data)
 ```
 
 
@@ -89,10 +100,10 @@ model <- ridgereg$new(dep_delay ~ ., data = training_data, lambda = 0.5)
 ## Train ridge regressions models for different values of $\lambda$
 
 ```{r rmse}
-rmse <- function(error)
-{
-    sqrt(mean(error^2))
-}
+# rmse <- function(error)
+# {
+#     sqrt(mean(error^2))
+# }
 
 ```
 
@@ -100,8 +111,6 @@ rmse <- function(error)
 
 ## Predict for the best $\lambda$ on the test data
 ```{r test data}
-
-
 
 ```
 
