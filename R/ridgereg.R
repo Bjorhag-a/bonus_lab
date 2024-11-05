@@ -20,11 +20,11 @@
 #' @import ggplot2
 #' @import methods
 #'
-#' @export
+#' @export ridgereg
 ridgereg <- setRefClass("ridgereg", 
                         fields = list(
                           formula = "formula",
-                          data_name = "name",
+                          data_name = "character",
                           data = "data.frame",
                           lambda = "numeric",
                           y = "numeric",
@@ -37,7 +37,7 @@ ridgereg <- setRefClass("ridgereg",
                         methods = list(
                           initialize = function(formula, data, lambda){
                             # save the name of the dataset for later usage
-                            .self$data_name <<- substitute(data)
+                            .self$data_name <<- as.character(substitute(data))
                             
                             .self$formula <<- formula
                             .self$lambda <<- lambda
@@ -101,10 +101,10 @@ ridgereg <- setRefClass("ridgereg",
                           }
                           
                         ))
-ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
-print(ridgereg_mod)
-ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
-# class(ridgereg_mod)[1] == "ridgereg"
-ridgereg_mod$predict()
-#ridgereg_mod$print()
-ridgereg_mod$coef()
+# ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
+# print(ridgereg_mod)
+# ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
+# # class(ridgereg_mod)[1] == "ridgereg"
+# ridgereg_mod$predict()
+# #ridgereg_mod$print()
+# ridgereg_mod$coef()

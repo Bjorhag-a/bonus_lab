@@ -14,7 +14,8 @@ knitr::opts_chunk$set(
 )
 ```
 # Introduction
-In this vignette there will be shown how to do a simple prediction problem using the ridgereg function
+In this vignette there will be shown how to do a simple prediction problem using the ridgereg function.
+Here is some packages you need to do the test shown. 
 ```{r setup}
 library(bonus)
 library(caret)
@@ -55,7 +56,7 @@ normal_lm <- train(medv ~ ., data = training,
 normal_lm
 summary(normal_lm)
 ```
-
+This is just a normal summary of the model where we can see that all variables is selected and most of them are significant and have a RMSE value of 5.048539.
 
 ##  Linear regression model with forward selection
 Here we create the Linear regression model with forward selection using the caret package.
@@ -67,7 +68,8 @@ forward_lm
 summary(forward_lm)
 ```
 
-
+With the help of the summary we can see that the best model had 4 variables due to having the smallest RMSE value at 5.334649 compared to a model with 3 variables that had a RMSE value of 5.48686. 
+The model with 4 variables have the explanatory variables rm (average number of rooms per dwelling), ptratio (pupil-teacher ratio by town), black (1000(k−0.63)^2 where B is the proportion of blacks by town) and lstat (percentage of lower status of the population).
 
 
 ## Evaluate the performance of this model on the training dataset
@@ -85,7 +87,7 @@ postResample(pred = pred_forward, obs = training$medv)
 
 ```
 And here is the RMSE, Rsquared and MAE values for the Linear regression model with forward selection.
-The RMSE and MAE has a higher value and a lower Rsquared percent for the model with forward selection. 
+The RMSE and MAE has a higher value and a lower Rsquared percent for the model with forward selection. This means that the "normal" regression makes better predictions then the forward selection model. This can be explain that the "normal" model have all variables and therefor can predict better for the test data. The forward selection model selects some variables that deemed significant and therefor can reduce over fitting. 
 
 
 
@@ -97,12 +99,11 @@ ridge_model <- list(label = "Ridge regression model",
                     parameters = data.frame(parameter = "lambda",
                                             class = "numeric"), 
                     grid = function(x, y, search = "grid", len = NULL){
-                      data.frame(lambda = seq(0.1, 10, by = 0.1))
+                      data.frame(lambda = seq(0.01, 2, by = 00.1))
                     },
                     fit = function(x, y, param, lev, last, weights, classProbs, ...){
-                      data <- as.data.frame(cbind(x, y))
-                      model <- bonus::ridgereg$new(y ~ ., data, lambda = param$lambda)
-                      return(model)
+                      ridgereg$new(y ~ ., as.data.frame(cbind(x, y)), lambda = param$lambda)
+                      
                     },
                     predict = function(modelFit, newdata, preProc = NULL, submodels = NULL){
                       predictions <- modelFit$predict(newdata)
@@ -113,20 +114,46 @@ ridge_model <- list(label = "Ridge regression model",
                     
                     )
 ```
-
+Here the setup for my own model for the train function in caret. 
 
 
 ## Find the best hyperparameter
 
 ```{r}
 fitControl <- trainControl(method = "cv",
-                           ## 10-fold CV...
+                           # 10-fold CV...
                            number = 10)
-#ridge <- train(medv ~., data = training,
-               #method = ridge_model, 
-               #trControl = fitControl)
+ridge <- train(medv ~., data = training, 
+               method = ridge_model, 
+               trControl = fitControl,
+               preProc = c("center", "scale"))
+ridge
 ```
+Here the selection of the \lamda with use of 10-fold cross-validation is made.
+After have tried many different ranges of the grid the grid was searched between 0.01 and 2. The different evaluation metrics did not change so much for all of the different lambda so this is why the range was set. 
+And from the output we see that the model with the smallest value of RMSE had a \lambda value of 1.71
 
 
 # Evaluate the performance of all three models
+```{r}
+pred_test_normal <- predict(normal_lm, testing)
+normal_eval <- postResample(pred = pred_test_normal, obs = testing$medv)
 
+pred_test_forward <- predict(forward_lm, testing)
+forward_eval <- postResample(pred = pred_test_forward, obs = testing$medv)
+
+pred_test_ridge <- predict(ridge, testing)
+ridge_eval <- postResample(pred = pred_test_ridge, obs = testing$medv)
+
+results_df <- data.frame(
+  Model = c("Normal Linear Regression", "Forward Selection Regression", "Ridge Regression"),
+  RMSE = c(normal_eval["RMSE"], forward_eval["RMSE"], ridge_eval["RMSE"]),
+  Rsquared = c(normal_eval["Rsquared"], forward_eval["Rsquared"], ridge_eval["Rsquared"]),
+  MAE = c(normal_eval["MAE"], forward_eval["MAE"], ridge_eval["MAE"])
+)
+results_df
+```
+Here the RMSE, Rsquared and the MAE for the test data is shown for the different regressions. 
+We can see that the "Normal" and the ridge regression have some very similar values for the different metrics. From the training data the Normal regression had a Rsquared value 0.7448751 and now went down to 0.7137913 so a little bit of over fitting but nothing alarming. So there is a discussion that is going to be made if you just want to do a normal regression for this data just because its so easy to use or you want to use a ridge regression that is more complicated but help with collinearity if there is any.
+The forward regression have a lower Rsquared then both of them so the model have missed out on some predictive power because of the model only having 4 variables like i said before but the model is still relatively good for being so simple.
+Because this is not a very in depth lab about regression i would say that the normal regression is a appropriate choose but all of them are relatively good. 
