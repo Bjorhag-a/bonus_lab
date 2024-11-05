@@ -3,8 +3,8 @@ Type: Package
 Title: Bonus Lab
 Version: 1.0
 Date: 2024-10-30
-Author: Björhag, Alexander
-Maintainer: <alebj452@student.liu.se>
+Author: Björhag, Alexander; Lindner, Jakob
+Maintainer: <alebj452@student.liu.se>, <jakli758@student.liu.se>
 Description: Assignment for the bonus lab in Advanced R programming.
 License: GPL-3 + file LICENSE
 Encoding: UTF-8

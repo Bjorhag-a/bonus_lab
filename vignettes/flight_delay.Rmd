@@ -84,8 +84,8 @@ test_data <- split_data[-validation, ]
 
 ```{r}
 # lambda_values <- seq(0, 10, by = 0.2)
-# 
 #model <- ridgereg$new(dep_delay ~ ., data = training_data, lambda = 0.01)
+#model$coef()
 
 ```
 

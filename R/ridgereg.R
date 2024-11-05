@@ -35,7 +35,7 @@ ridgereg <- setRefClass("ridgereg",
                           
                         ),
                         methods = list(
-                          initialize = function(formula, data, lambda){
+                          initialize = function(formula, data, lambda, QR = FALSE){
                             # save the name of the dataset for later usage
                             .self$data_name <<- as.character(substitute(data))
                             
@@ -46,10 +46,17 @@ ridgereg <- setRefClass("ridgereg",
                             
                             X <<- model.matrix(formula, data)
                             .self$x_norm <<- cbind(X[, 1], scale(X[, -1]))
-                            
                             .self$y <<- data[[all.vars(formula)[1]]]
                             lambda_I <- diag(lambda, ncol(.self$x_norm))
                             
+                            if (QR == TRUE) {
+                              QR <- qr(X)
+                              Q <- qr.Q(QR)
+                              R <- qr.R(QR)
+                              
+                              .self$beta <<-solve(t(R) %*% R + lambda_I) %*% t(.self$x_norm) %*% .self$y
+                              
+                               }
                             
                             
                             .self$beta <<- solve(t(.self$x_norm) %*% .self$x_norm + lambda_I) %*% t(.self$x_norm) %*% .self$y
