@@ -13,7 +13,8 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-
+# Introduction
+In this vignette there will be shown how to do a simple prediction problem using the ridgereg function
 ```{r setup}
 library(bonus)
 library(caret)
@@ -22,11 +23,15 @@ library(MASS)
 
 ```
 
+# Data 
+In this vignette the BostonHousing from  the mlbench package will be used and the y-variable that has been chosen is the medv variable that represent the  median value of owner-occupied homes in USD 1000's. And the rest of the data will be x-variables. 
 ```{r}
 data("Boston")
 head(Boston)
 ```
 
+Here the data is divided into training and test data sets using the createDataPartition function from the caret package.
+The split is 80 percent training data and 20 percent test data, that results in 407 observations in the training data and 99 observations to the test data .
 ```{r}
 set.seed(98)
 inTraining <- createDataPartition(Boston$medv, p = .80, list = FALSE)
@@ -34,24 +39,15 @@ training <- Boston[inTraining, ]
 testing  <- Boston[-inTraining, ]
 ```
 
-##  Linear regression model with forward selection
-```{r}
-forward_lm <- train(medv ~ ., data = training, 
-                 method = "leapForward"
-                 )
-forward_lm
-summary(forward_lm)
-```
 
-
-```{r plot backward}
-
-plot(forward_lm)
-```
-
+# Modeling Linear regression model 
+In this vignette two models are gonna be created using the caret package.
+The models are gonna be a  Linear regression model and a Linear regression model with forward selection
 
 
 ##  Linear regression model 
+Here we create the "normal" Linear regression model using the caret package.
+
 ```{r}
 normal_lm <- train(medv ~ ., data = training, 
                  method = "lm"
@@ -60,6 +56,16 @@ normal_lm
 summary(normal_lm)
 ```
 
+
+##  Linear regression model with forward selection
+Here we create the Linear regression model with forward selection using the caret package.
+```{r}
+forward_lm <- train(medv ~ ., data = training, 
+                 method = "leapForward"
+                 )
+forward_lm
+summary(forward_lm)
+```
 
 
 
@@ -70,8 +76,57 @@ pred <- predict(normal_lm, training)
 postResample(pred = pred, obs = training$medv)
 
 ```
+
+So first up is the RMSE, Rsquared and MAE values for the "normal" Linear regression model
+
 ```{r evaluate forward}
 pred_forward <- predict(forward_lm, training)
 postResample(pred = pred_forward, obs = training$medv)
 
 ```
+And here is the RMSE, Rsquared and MAE values for the Linear regression model with forward selection.
+The RMSE and MAE has a higher value and a lower Rsquared percent for the model with forward selection. 
+
+
+
+# Modeling a ridge regression model 
+```{r}
+ridge_model <- list(label = "Ridge regression model",
+                    library = "bonus", 
+                    type = "Regression",
+                    parameters = data.frame(parameter = "lambda",
+                                            class = "numeric"), 
+                    grid = function(x, y, search = "grid", len = NULL){
+                      data.frame(lambda = seq(0.1, 10, by = 0.1))
+                    },
+                    fit = function(x, y, param, lev, last, weights, classProbs, ...){
+                      data <- as.data.frame(cbind(x, y))
+                      model <- ridgereg$new(y ~ ., data, lambda = param$lambda)
+                      return(model)
+                    },
+                    predict = function(modelFit, newdata, preProc = NULL, submodels = NULL){
+                      predictions <- modelFit$predict(newdata)
+                      return(predictions)
+                    },
+                    prob = NULL
+                    
+                    
+                    )
+```
+
+
+
+## Find the best hyperparameter
+
+```{r}
+fitControl <- trainControl(method = "cv",
+                           ## 10-fold CV...
+                           number = 10)
+ridge <- train(medv ~., data = training,
+               method = ridge_model, 
+               trControl = fitControl)
+```
+
+
+# Evaluate the performance of all three models
+

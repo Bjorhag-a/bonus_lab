@@ -1,23 +1,26 @@
-#'  @title Reference Class representing a Ridge Linear regression using least square 
-#'  
+#' @title Reference Class representing a Ridge Linear regression using least square 
+#' 
 #' @description ridgereg is used to fit linear models with a penalty lambda and
 #'   using ordinary linear algebra to calculate the Regressions coefficients and
 #'   fitted values
-#'   
-#' @name ridgereg
-#' @field formula a formula object. 
-#' @field data a data frame.  
-#' @field lambda a numeric number. 
-#'
+#' 
+#' 
+#' @param formula a formula object.
+#' @param data a data frame.
+#' @param lambda a numeric number.
+#' 
 #' @returns an object of class `ridgereg`
-#' @export ridgereg
-#'
+#' 
 #' @examples
-#' #' # data(iris)
-#' # l <- ridgereg$new(formula=Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
+#' # data(iris)
+#' # ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
 #' # l$coef()
 #' 
-
+#'  
+#' @import ggplot2
+#' @import methods
+#'
+#' @export
 ridgereg <- setRefClass("ridgereg", 
                         fields = list(
                           formula = "formula",
@@ -54,7 +57,7 @@ ridgereg <- setRefClass("ridgereg",
                             
                             
                           },
-                          print = function() {
+                          show = function() {
                             cat("Call:")
                             cat("\n")
                             
@@ -76,8 +79,7 @@ ridgereg <- setRefClass("ridgereg",
                             cat("\n")
                             cat(line2)
                             
-                            
-                            
+                           
                             
                           },
                           predict = function(newdata = NULL){
@@ -86,9 +88,10 @@ ridgereg <- setRefClass("ridgereg",
                               
                             }
                             else{
-                              sds <- apply(X[,-1], 2, sd)
-                              newdata_norm <- scale(newdata,colMeans(X[,-1]),sds)
-                              prediction <- as.matrix(cbind(1,newdata_norm)) %*% reg_coef_ridge
+                              standard_dev <- apply(X[, -1], 2, sd)
+                              normalized_new_data <- scale(newdata, colMeans(X[, -1]), standard_dev)
+                              prediction <- as.matrix(cbind(1, normalized_new_data)) %*% .self$beta
+                              
                               return(prediction)
                             }
                             
@@ -98,13 +101,10 @@ ridgereg <- setRefClass("ridgereg",
                           }
                           
                         ))
-
-
-# model <- ridgereg$new(Petal.Length~ Sepal.Length + Petal.Width , data = iris, lambda = 0.5)
-# model
-# model$coef()
-# model$print()
-# model$predict()
+#ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
+#print(ridgereg_mod)
 # ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
+# class(ridgereg_mod)[1] == "ridgereg"
 # ridgereg_mod$predict()
-# ridgereg_mod$coef()
+#ridgereg_mod$print()
+# ridgereg_mod$show()

@@ -10,13 +10,16 @@ License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 3.5.0),
     ggplot2,
-    methods
+    methods,
+    nycflights13,
+    dplyr,
+    magrittr,
+    tidyverse
 RoxygenNote: 7.3.2
 Suggests: 
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
-    nycflights13,
     caret,
     MASS,
     leaps

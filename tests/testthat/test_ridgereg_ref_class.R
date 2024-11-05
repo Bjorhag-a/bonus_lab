@@ -1,4 +1,3 @@
-library(bonus) 
 data("iris")
 
 Polygon <- setRefClass("Polygon", fields = c("sides"))
@@ -18,20 +17,20 @@ test_that("class is correct", {
 test_that("print() method works", {
   ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
   
-  expect_output(ridgereg_mod$print(),"ridgereg\\(formula = Petal\\.Length ~ Sepal\\.Width \\+ Sepal\\.Length, data = iris\\)")
-  expect_output(ridgereg_mod$print(),"( )*\\(Intercept\\)( )*Sepal\\.Width( )*Sepal\\.Length")
+  expect_output(print(ridgereg_mod),"ridgereg\\(formula = Petal\\.Length ~ Sepal\\.Width \\+ Sepal\\.Length, data = iris\\, lambda = 0.5)")
+  expect_output(print(ridgereg_mod),"( )*\\(Intercept\\)( )*Sepal\\.Width( )*Sepal\\.Length")
 })
 
-test_that("pred() method works", {
+test_that("predict() method works", {
   ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
   
-  expect_equal(round(unname(ridgereg_mod$predict()[c(1,5,7)]),2), c(1.85, 1.53, 1.09))    
+  expect_equal(round(unname(ridgereg_mod$predict()[c(1,5,7)]),2), c(1.84, 1.53, 1.09))    
 })
 
 
 test_that("coef() method works", {
-  ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris)
+  ridgereg_mod <- ridgereg$new(Petal.Length~Sepal.Width+Sepal.Length, data=iris, lambda = 0.5)
   
-  expect_true(all(round(unname(ridgereg_mod$coef()),2) %in% c(3.7455150, -0.5820664, 1.4655540)))
+  expect_true(all(round(unname(ridgereg_mod$coef()),2) %in% c(3.75, -0.58, 1.47)))
 })
 

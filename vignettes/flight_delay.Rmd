@@ -16,8 +16,11 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(bonus)
-library(dplyr)
 library(caret)
+library(tidyverse)
+library(magrittr)
+library(nycflights13)
+library(dplyr)
 ```
 
 # Data from nycflights13
@@ -35,10 +38,10 @@ Also cleaning the data from missing values that resulted in 14964 observations g
 
 ```{r clean data}
 weather <- weather %>% 
-  select(origin, year, month, day, hour, temp, dewp, humid, wind_dir, wind_speed, precip, pressure, visib)
+  dplyr::select(origin, year, month, day, hour, temp, dewp, humid, wind_dir, wind_speed, precip, pressure, visib)
 
 flights <- flights %>% 
-  select(dep_delay, arr_delay, carrier, origin, dest,
+  dplyr::select(dep_delay, arr_delay, carrier, origin, dest,
          year, month, day, hour)
 
 #Need to join them by year, month, day and hour otherwise the data set gets too big for only origin 
@@ -76,7 +79,9 @@ test_data <- split_data[-validation, ]
 # Training the model with different $\lambda$ 
 
 ```{r}
-#model <- ridgereg$new(dep_delay ~ ., data = training_data, lambda = 0.5)
+lambda_values <- seq(0, 10, by = 0.2)
+
+model <- ridgereg$new(dep_delay ~ ., data = training_data, lambda = 0.5)
 ```
 
 

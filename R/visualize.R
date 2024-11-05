@@ -10,11 +10,11 @@
 #' @export
 #' 
 #' @import ggplot2
+#' @import methods
 #' @import dplyr
 #' @import magrittr
 #' @import nycflights13
-#' 
-#' 
+#' @import tidyverse
 visualize_airport_delays <- function(){
   airports <- nycflights13::airports
   flights <- nycflights13::flights
